@@ -1,0 +1,184 @@
+#include<iostream>
+#include<glut.h>
+#include<cmath>
+using namespace std;
+double r[3][4] = { {250,300,300,250},{290,290,350,350},{1,1,1,1} };
+double result[3][4] = { {0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0} };
+
+
+void drawRect() {
+	glBegin(GL_QUADS);
+	glVertex2d(r[0][0], r[1][0]);
+	glVertex2d(r[0][1], r[1][1]);
+	glVertex2d(r[0][2], r[1][2]);
+	glVertex2d(r[0][3], r[1][3]);
+	glEnd();
+	glFlush();
+}
+
+void drawFinal() {
+	glBegin(GL_QUADS);
+	glVertex2d(result[0][0], result[1][0]);
+	glVertex2d(result[0][1], result[1][1]);
+	glVertex2d(result[0][2], result[1][2]);
+	glVertex2d(result[0][3], result[1][3]);
+	glEnd();
+	glFlush();
+
+}
+
+void rotate() {
+	double q, deg;
+	int i, j, k;
+	cout << "ENter angle of rotation";
+	cin >> q;
+	deg = q * (3.14159 / 180);
+
+	double a[3][3] = { {cos(deg), -sin(deg),  0},
+					 { sin(deg), cos(deg) ,  0},
+					 {0    , 0      ,  1} };
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 4; j++) {
+			result[i][j] = 0;
+			for (k = 0; k < 3; k++) {
+				result[i][j] += a[i][k] * r[k][j];
+			}
+		}
+	}
+
+}
+void scale() {
+	int sx, sy,i,j,k;
+	cout << "Enter scaling factors (x) : ";
+	cin >> sx;
+	cout << endl<< "Enter scaling factors (y) : ";
+	cin >> sy;
+	double a[3][3] = { {sx, 0,  0},
+					 { 0, sy ,  0},
+					 {0 , 0 ,  1} };
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 4; j++) {
+			result[i][j] = 0;
+			for (k = 0; k < 3; k++) {
+				result[i][j] += a[i][k] * r[k][j];
+			}
+		}
+	}
+
+
+}
+void translate() {
+	int  i, j, k;
+	double tx, ty;
+	cout << "Enter translation in x-axis: ";
+	cin>> tx;
+	cout << endl << "Enter translation in y-axis: ";
+	cin >> ty;
+	double	a[3][3] = { {1 , 0 ,  tx},
+					 { 0 , 1,  ty},
+					 { 0 , 0 ,   1} };
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 4; j++) {
+			result[i][j] = 0;
+			for (k = 0; k < 3; k++) {
+				result[i][j] += a[i][k] * r[k][j];
+			}
+		}
+	}
+
+
+}
+
+void reflectionX() {
+	int i, j, k;
+	double a[3][3] = { {1, 0,  0},
+					 { 0,-1  ,  0},
+					 {0    , 0      ,  1} };
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 4; j++) {
+			result[i][j] = 0;
+			for (k = 0; k < 3; k++) {
+				result[i][j] += a[i][k] * r[k][j];
+			}
+		}
+	}
+
+}
+
+void reflectionY() {
+	int i, j, k;
+	double a[3][3] = { {-1, 0,  0},
+					 { 0,  1  ,  0},
+					 {0    , 0      ,  1} };
+
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 4; j++) {
+			result[i][j] = 0;
+			for (k = 0; k < 3; k++) {
+				result[i][j] += a[i][k] * r[k][j];
+			}
+		}
+	}
+
+
+}
+void display() {
+	drawRect();
+	int input;
+	cout << "**********MENU**********" << endl;
+	cout << "1.Rotate\n2.Scale\n3.Translate\n4.Reflection on X-axis\n5.Reflection on Y-axis" << endl;
+	cout << "Enter your decision : ";
+	cin >> input;
+	cout << endl;
+	switch (input) {
+		case 1:
+			rotate();
+			drawFinal();
+			break;
+		case 2:
+			scale();
+			drawFinal();
+			break;
+		case 3:
+			translate();
+			drawFinal();
+			break;
+		case 4:
+			reflectionX();
+			drawFinal();
+			break;
+		case 5:
+			reflectionY();
+			drawFinal();
+			break;
+		default:
+			cout << "Invalid operation!!";
+			exit(1);
+
+	}
+
+}
+
+
+void init() {
+	glClearColor(0, 0, 0, 0);
+	glColor3f(1.0, 0.0, 0.0);
+	gluOrtho2D(-800, 800, -800, 800);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+
+int main(int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(800, 800);
+	glutCreateWindow("Transformations");
+	init();
+	glutDisplayFunc(display);
+	glutMainLoop();
+	return 0;
+}
